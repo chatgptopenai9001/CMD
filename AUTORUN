@@ -1,0 +1,28 @@
+@echo off
+taskkill /im FastExecuteScript.exe /f /t
+start .\Shutdown.exe
+timeout /t 20 /nobreak >nul
+set count=0
+:start
+set /a count+=1
+if %count% leq 20 (
+start .\click.exe
+timeout /t 20 /nobreak >nul
+goto start
+)
+timeout /t 20 /nobreak >nul
+:check_worker
+tasklist | find /i "worker.exe" >nul
+if errorlevel 1 (
+echo Worker.exe is not running. Restarting...
+taskkill /im FastExecuteScript.exe /f /t
+start .\Shutdown.exe
+timeout /t 20 /nobreak >nul
+set count=0
+goto start
+) else (
+echo Worker.exe is running.
+)
+timeout /t 3600 /nobreak >nul
+set count=0
+goto start
